@@ -29,7 +29,7 @@ export const roles: Role[] = [
   },
   {
     name: "Werewolf",
-    ratio: .45,
+    ratio: .3,
   },
   {
     name: "Spotter",

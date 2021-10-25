@@ -1,4 +1,4 @@
-import { chance, getPlayers, getRoles, hasUsedScroll, Player, sumBy } from './common';
+import { chance, getPlayers, getRoles, hasUsedScroll } from './common';
 
 const players = getPlayers();
 let roles = getRoles();
@@ -9,9 +9,9 @@ for (let index in players) {
   const player = players[index];
 
   const chances = roles.map(role => {
-    const scrolls = player.scrolls.filter(scroll => !hasUsedScroll(role, scroll));
+    const scroll = player.scrolls.find(scroll => !hasUsedScroll(role, scroll));
 
-    return 100 + sumBy(scrolls, scroll => scroll?.effect, 0);
+    return 1 + (scroll?.effect ?? 0);
   });
 
   player.role = chance.weighted(roles, chances);
@@ -22,19 +22,24 @@ for (let index in players) {
   for (const i in player.scrolls) {
     const scroll = player.scrolls[i];
     if (hasUsedScroll(player.role, scroll)) {
-      usedScroll = scroll.used = true;
+      scroll.used = true;
+      usedScroll = true;
     }
   }
 
   // find first matched role and remove it from the list
+  let roleIndex = 0;
   for (let i = 0; i < roles.length; i++) {
     if (roles[i] === player.role) {
       roles.splice(i, 1);
+      roleIndex = i;
       break;
     }
   }
 
-  console.log(`${player.name} is a ${player.role} ${usedScroll ? '(A scroll was used...)' : ''}`);
+  const calculatedChance = (chances[roleIndex] / (roles.length + 1) * 100).toFixed(2);
+
+  console.log(`${player.name} is a ${player.role} ${usedScroll ? '(A scroll was used...)' : ''} - ${calculatedChance}%`);
 }
 console.timeEnd('reducing-stock');
 
@@ -42,5 +47,5 @@ console.log('\n\n'); // spacer
 
 // list all users
 for (const user of players) {
-  console.log(`${user.name} is a ${user.role}\n\t(${user.scrolls.map(s => `${s.role} -> ${s.effect* 100}% [${s.used}]`)})`);
+  console.log(`${user.name} is a ${user.role}\n\t(${user.scrolls.map(s => `${s.role} -> ${(s.effect * 100).toFixed(2)}% [${s.used}]`)})`);
 }

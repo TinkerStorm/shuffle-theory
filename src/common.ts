@@ -10,16 +10,6 @@ export interface Player {
   role?: string
 }
 
-// chance.mixin({
-//   scroll: function (): Scroll {
-//     return {
-//       role: chance.pickone(defaultRoles).name,
-//       effect: chance.floating({ min: -.5, max: .5, fixed: 2 }),
-//       used: false
-//     }
-//   }
-// });
-
 export function getPlayers(count: number = 10): Player[] {
   const array = Array(count).fill(0).map(() => ({
     name: chance.name(),
@@ -55,7 +45,7 @@ export function getRoles(count: number = 10, roles: Role[] = defaultRoles): stri
  * @param max The maximum effect of each scroll
  * @returns An array of scrolls
  */
-export function getScrolls(maxScrolls: number = 3, min: number = -0.3, max: number = 0.3): Scroll[] {
+export function getScrolls(maxScrolls: number = 3, min: number = -0.1, max: number = 0.3): Scroll[] {
   return chance.pickset(
     defaultRoles.map(role => ({
       role: role.name,
@@ -76,4 +66,10 @@ export function hasUsedScroll(role: string, scroll: Scroll): boolean {
 
 export function sumBy<T>(arr: T[], predicate: (el: T) => number, fallback: number = 0): number {
   return arr.reduce((prev, curr) => prev + (predicate(curr) ?? fallback), 0)
+}
+
+export function clamp(value: number, min: number, max: number) {
+  if (value < min) return min;
+  else if (value < max) return max;
+  else return value;
 }
