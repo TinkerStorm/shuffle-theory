@@ -69,6 +69,7 @@ export function getScrolls(maxScrolls: number = 3, min: number = -0.3, max: numb
 export function hasUsedScroll(role: string, scroll: Scroll): boolean {
   return !scroll.used && (
     scroll.role === role && scroll.effect >= 0 // it shouldn't be 0, but consider it an edge case in this research
-    || scroll.role !== role && scroll.effect < 0
+  ) || (
+    scroll.role !== role && scroll.effect < 0
   );
 }
