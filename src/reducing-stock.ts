@@ -1,4 +1,4 @@
-import { chance, getPlayers, getRoles, hasUsedScroll, Player } from './common';
+import { chance, getPlayers, getRoles, hasUsedScroll, Player, sumBy } from './common';
 
 const players = getPlayers();
 let roles = getRoles();
@@ -9,9 +9,9 @@ for (let index in players) {
   const player = players[index];
 
   const chances = roles.map(role => {
-    const scroll = player.scrolls.find(scroll => scroll.role === role && !scroll.used);
+    const scrolls = player.scrolls.filter(scroll => !hasUsedScroll(role, scroll));
 
-    return 100 + (scroll?.effect ?? 0);
+    return 100 + sumBy(scrolls, scroll => scroll?.effect, 0);
   });
 
   player.role = chance.weighted(roles, chances);
@@ -23,7 +23,6 @@ for (let index in players) {
     const scroll = player.scrolls[i];
     if (hasUsedScroll(player.role, scroll)) {
       usedScroll = scroll.used = true;
-      break;
     }
   }
 

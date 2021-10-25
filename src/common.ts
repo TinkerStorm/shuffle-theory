@@ -73,3 +73,7 @@ export function hasUsedScroll(role: string, scroll: Scroll): boolean {
     scroll.role !== role && scroll.effect < 0
   );
 }
+
+export function sumBy<T>(arr: T[], predicate: (el: T) => number, fallback: number = 0): number {
+  return arr.reduce((prev, curr) => prev + (predicate(curr) ?? fallback), 0)
+}
