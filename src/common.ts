@@ -1,21 +1,12 @@
 import { Chance } from 'chance';
-
-import { Role, roles as defaultRoles, Scroll } from './data';
+import { Player, Role, roles as defaultRoles, Scroll } from './data';
 
 export const chance = new Chance();
 
-export interface Player {
-  name: string;
-  scrolls: Scroll[];
-  role?: string
-}
-
-export function getPlayers(count: number = 10): Player[] {
-  const array = Array(count).fill(0).map(() => ({
-    name: chance.name(),
-    scrolls: getScrolls(),
-    role: undefined
-  }));
+export function getPlayers(count: number = Player.COUNT): Player[] {
+  const array = Array(count).fill(0).map(() =>
+    new Player(chance.name(), getScrolls())
+  );
 
   return chance.shuffle(array);
 };
@@ -25,7 +16,7 @@ export function getPlayers(count: number = 10): Player[] {
  * @param roles The roles to generate.
  * @returns An array of roles scaled up (or down) based on the player count provided.
  */
-export function getRoles(count: number = 10, roles: Role[] = defaultRoles): string[] {
+export function getRoles(count: number = Player.COUNT, roles: Role[] = defaultRoles): string[] {
   const sum = roles.reduce((sum, role) => sum + role.ratio, 0);
   // count / sum(roles.*.ratio)
   const scaleFactor = count / sum;
@@ -47,11 +38,10 @@ export function getRoles(count: number = 10, roles: Role[] = defaultRoles): stri
  */
 export function getScrolls(maxScrolls: number = 3, min: number = -0.1, max: number = 0.3): Scroll[] {
   return chance.pickset(
-    defaultRoles.map(role => ({
-      role: role.name,
-      effect: chance.floating({ min, max }),
-      used: false
-    })),
+    defaultRoles.map(role => new Scroll(
+      role.name,
+      chance.floating({ min, max })
+    )),
     chance.integer({ min: 0, max: maxScrolls })
   );
 }
@@ -72,4 +62,40 @@ export function clamp(value: number, min: number, max: number) {
   if (value < min) return min;
   else if (value < max) return max;
   else return value;
+}
+
+export const log = (...args: any[]) => console.log(...args);
+
+export function logChances(players: Player[]): void {
+  // roles are guaranteed to have the same ratio
+  const uniqueRoles = getRoles(players.length).filter((role, index, roles) => roles.indexOf(role) === index);
+
+  for (const role of uniqueRoles) {
+    log();
+    for (const player of players) {
+      const appliedScrolls = player.scrolls.filter(scroll => hasUsedScroll(role, scroll));
+      // TODO: account for the different effects from other players
+      const chance = (
+        (1 + sumBy(appliedScrolls, scroll => scroll.effect, 0)
+      ) / players.length * 100);
+
+      log(`[${role}] ${player.name} had ${chance.toFixed(2)}% chance.`);
+    }
+  }
+}
+
+export function logScrolls(players: Player[]): void {
+  log();
+  for (const player of players) {
+    // (playerChance / overallChance * 100).toFixed(2) + % ??
+    log(`${player.name} is a ${player.role}\n\t${
+      player.scrolls.map(scroll => `${scroll} [${scroll.used}]`).join('\n\t')
+    }`);
+  }
+}
+
+export function averageChance(players: Player[]): number {
+  return players.reduce((acc, cur) => acc + (
+    (1 + sumBy(cur.usedScrolls, scroll => scroll.effect, 0)
+  ) / players.length * 100), 0);
 }

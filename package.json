@@ -8,7 +8,7 @@
   },
   "license": "GPL-3.0",
   "scripts": {
-    "all": "npm-run-all build mode:**",
+    "all": "npm-run-all --serial build mode:**",
     "build": "tsc",
     "mode:auction": "node ./dist/auction-bid.js",
     "mode:stock": "node ./dist/reducing-stock.js"

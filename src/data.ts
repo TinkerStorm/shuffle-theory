@@ -43,19 +43,67 @@ export const roles: Role[] = [
 //#endregion
 
 //#region Scroll
-export interface Scroll {
-  /**
-   * The role that the scroll modifies.
-   * @description
-   * Cross-referenced with `roles` that modify the chances for a player to get this role.
-   */
-  role: string; // Role#name
-  /**
-   * The effect modifier to be applied to the role's chances.
-   */
-  effect: number;
-  /**
-   * The used state of the scroll. (Defaults to `false`)
-   */
-  used: boolean;
+export class Scroll {
+  used: boolean = false;
+
+  constructor(
+    public role: string,
+    public effect: number
+  ) {
+
+  }
+
+  get effectString() {
+    return `${this.effect > 0 ? "+" : ""}${((this.effect) * 100).toFixed(2)}%`;
+  }
+
+  use() {
+    this.used = true;
+  }
+
+  chanceMap(players: Player[]): { [player: string]: number } {
+    const map = Object.create(null);
+    //#region loop1 - intial map
+    for (const player of players) {
+      map[player.name] = 1;
+      // get effect from scrolls
+      for (const scroll of player.scrolls.filter(scroll => scroll.role == this.role)) {
+        if (scroll.role === this.role) {
+          map[player.name] += scroll.effect;
+        }
+      }
+    }
+    //#endregion
+    //#region loop2 - scale to players
+    const scaleFactor = players.length + players.map(player => player.scrolls
+      .filter(scroll => scroll.role === this.role)
+      .map(scroll => scroll.effect)
+    ).flat().reduce((a, b) => a + b, 0) / players.length;
+    for (const player of players) {
+      map[player.name] *= scaleFactor;
+    }
+    //#endregion
+    return map;
+  }
+
+  toString() {
+    return `${this.role} scroll of ${this.effectString}`;
+  }
+}
+
+export class Player {
+  role?: string;
+
+  constructor(
+    public name: string,
+    public scrolls: Scroll[] = []
+  ) {
+
+  }
+
+  get usedScrolls() {
+    return this.scrolls.filter(s => s.used);
+  }
+
+  static COUNT = 10;
 }

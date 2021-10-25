@@ -1,4 +1,4 @@
-import { chance, getPlayers, getRoles, hasUsedScroll } from './common';
+import { chance, getPlayers, getRoles, hasUsedScroll, log, logChances, logScrolls, sumBy } from './common';
 
 const players = getPlayers();
 let roles = getRoles();
@@ -9,9 +9,9 @@ for (let index in players) {
   const player = players[index];
 
   const chances = roles.map(role => {
-    const scroll = player.scrolls.find(scroll => !hasUsedScroll(role, scroll));
+    const scrolls = player.scrolls.filter(scroll => !hasUsedScroll(role, scroll));
 
-    return 1 + (scroll?.effect ?? 0);
+    return 1 + sumBy(scrolls, scroll => scroll?.effect, 0);
   });
 
   const isLastRole = roles.length <= 1;
@@ -22,18 +22,7 @@ for (let index in players) {
 
   
   if(isLastRole)
-    console.log("Last player got the remaining role (chance.weighted was not used).");
-
-
-  // mark scroll as used
-  let usedScroll = false;
-  for (const i in player.scrolls) {
-    const scroll = player.scrolls[i];
-    if (hasUsedScroll(player.role, scroll)) {
-      scroll.used = true;
-      usedScroll = true;
-    }
-  }
+    log("Last player got the remaining role (chance.weighted was not used).");
 
   // find first matched role and remove it from the list
   let roleIndex = 0;
@@ -47,13 +36,23 @@ for (let index in players) {
 
   const calculatedChance = (chances[roleIndex] / (roles.length + 1) * 100).toFixed(2);
 
-  console.log(`${player.name} is a ${player.role} ${usedScroll ? '(A scroll was used...)' : ''} - ${calculatedChance}%`);
+  log(`${player.name} is a ${player.role} - ${calculatedChance}%`);
 }
+
+log();
+
+for (const player of players) {
+  // determine if a negative effect scroll has been used
+  for (const scroll of player.scrolls){
+    if(hasUsedScroll(player.role!, scroll)) {
+      scroll.use();
+      log(`${player.name} used a ${scroll}`);
+    }
+  }
+}
+
+log();
 console.timeEnd('reducing-stock');
 
-console.log('\n\n'); // spacer
-
-// list all users
-for (const user of players) {
-  console.log(`${user.name} is a ${user.role}\n\t(${user.scrolls.map(s => `${s.role} -> ${(s.effect * 100).toFixed(2)}% [${s.used}]`)})`);
-}
+logScrolls(players);
+logChances(players);
