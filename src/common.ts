@@ -36,7 +36,9 @@ export function getPlayers(count: number = 10): Player[] {
  * @returns An array of roles scaled up (or down) based on the player count provided.
  */
 export function getRoles(count: number = 10, roles: Role[] = defaultRoles): string[] {
-  const scaleFactor = sumBy(roles, role => role.ratio, 0);
+  const sum = roles.reduce((sum, role) => sum + role.ratio, 0);
+  // count / sum(roles.*.ratio)
+  const scaleFactor = count / sum;
 
   return roles.map(role => {
     // determine the number of roles to generate

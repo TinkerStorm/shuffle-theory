@@ -15,13 +15,10 @@ for (const role of roles) {
     const scrolls = player.scrolls.filter(scroll => scroll.role === role && !scroll.used);
 
     // if player has a scroll, return a chance of 100%+{effect??0}%
-    return 1 + sumBy(scrolls, scroll => scroll?.effect, 0);
+    return 100 + sumBy(scrolls, scroll => scroll?.effect, 0);
   });
 
   const selectedPlayer = chance.weighted(remainingPlayers, chances);
-
-  const playerIndex = remainingPlayers.indexOf(selectedPlayer);
-  const calculatedChance = chances[playerIndex] / remainingPlayers.length;
 
   // assign role to selected player
   selectedPlayer.role = role;
@@ -36,9 +33,7 @@ for (const role of roles) {
   }
 
   // log out the selected player
-  console.log(`${selectedPlayer.name} is a ${selectedPlayer.role} ${
-    usedScroll ? '(A scroll was used...)' : ''
-  } - ${(calculatedChance * 100).toFixed(2)}%`);
+  console.log(`${selectedPlayer.name} is a ${selectedPlayer.role} ${usedScroll ? '(A scroll was used...)' : ''}`);
 }
 console.timeEnd('auction-bid');
 
@@ -46,7 +41,5 @@ console.log('\n\n'); // spacer
 
 // list all users
 for (const { name, role, scrolls } of players) {
-  console.log(`${name} is a ${role}\n\t(${scrolls.map(s => 
-    `${s.role} -> ${(s.effect * 100).toFixed(2)}% [${s.used}]`
-  ).join(', ')})`);
+  console.log(`${name} is a ${role}\n\t(${scrolls.map(s => `${s.role} -> ${s.effect * 100}% [${s.used}]`)})`);
 }
