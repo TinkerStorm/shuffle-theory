@@ -1,6 +1,6 @@
-import { chance, getPlayers, getRoles } from './common';
+import { chance, getPlayers, getRoles, hasUsedScroll } from './common';
 
-const players = getPlayers(10);
+const players = getPlayers();
 const roles = getRoles();
 
 console.time('auction-bid');
@@ -27,7 +27,7 @@ for (const role of roles) {
   let usedScroll = false;
   for (const index in selectedPlayer.scrolls) {
     const scroll = selectedPlayer.scrolls[index];
-    if (scroll.role === role) {
+    if (hasUsedScroll(role, scroll)) {
       usedScroll = scroll.used = true;
       break;
     }

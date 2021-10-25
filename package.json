@@ -1,7 +1,7 @@
 {
   "name": "weighted-role-shuffle",
   "version": "1.0.0",
-  "description": "Weighted role shuffle possiblities ",
+  "description": "Weighted role shuffle possiblities.",
   "private": true,
   "dependencies": {
     "chance": "^1.1.8"

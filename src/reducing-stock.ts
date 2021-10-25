@@ -1,6 +1,6 @@
-import { chance, getPlayers, getRoles, Player } from './common';
+import { chance, getPlayers, getRoles, hasUsedScroll, Player } from './common';
 
-const players = getPlayers(10);
+const players = getPlayers();
 let roles = getRoles();
 
 console.time('reducing-stock');
@@ -21,7 +21,7 @@ for (let index in players) {
   // mark scroll as used
   for (const i in player.scrolls) {
     const scroll = player.scrolls[i];
-    if (scroll.role === player.role && !scroll.used) {
+    if (hasUsedScroll(player.role, scroll)) {
       usedScroll = scroll.used = true;
       break;
     }
