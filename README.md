@@ -6,8 +6,8 @@ Research into different shuffling theories and how they may effect a service as 
 The only comparison to make is how the roles are distributed, which have suttle differences in their state management.
 
 > **Note:** The following is a comparison between the calling of `console.time` and `console.timeEnd` and the time taken to execute the function.
-> - Lines 8 to 41 for [`reducing-stock`](./src/reducing-stock.ts#L8-L39)
-> - Lines 8 to 38 for [`auction-bid`](./src/auction-bid.ts#L8-L38)
+> - [`reducing-stock`](./src/reducing-stock.ts)
+> - [`auction-bid`](./src/auction-bid.ts)
 
 The chance of a role being assigned to a player is determined by `chance.shuffle`. When a role's chance is calculated, it can be anywhere between `70%` and `130%` - for now they are scaled up as integers, but I am unsure on the effect it may have on the chance outcomes.
 
@@ -33,8 +33,8 @@ yarn all
 
 ## Development Notes
 
-- [`reducing-stock`](./src/reducing-stock.ts#L8-L39) took around 2 hours to make (made on 22nd October 2021).
-- [`auction-bid`](./src/auction-bid.ts#L8-L39) took around 1 hour to make, using what I had learned from `reducing-stock` to change its iteration target (made on 23rd October 2021).
+- [`reducing-stock`](./src/reducing-stock.ts) took around 2 hours to make (made on 22nd October 2021).
+- [`auction-bid`](./src/auction-bid.ts) took around 1 hour to make, using what I had learned from `reducing-stock` to change its iteration target (made on 23rd October 2021).
 
 > This sandbox assumes that all players with active scrolls are unique scrolls per role. Multiple scrolls per role *can* be supported, but it strays dangerously close to imbalance of chance ratios between players.
 

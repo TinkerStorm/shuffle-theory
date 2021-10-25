@@ -14,11 +14,19 @@ for (let index in players) {
     return 1 + (scroll?.effect ?? 0);
   });
 
-  player.role = chance.weighted(roles, chances);
+  const isLastRole = roles.length <= 1;
 
-  let usedScroll = false;
+  player.role = isLastRole
+    ? chance.weighted(roles, chances)
+    : roles[0];
+
+  
+  if(isLastRole)
+    console.log("Last player got the remaining role (chance.weighted was not used).");
+
 
   // mark scroll as used
+  let usedScroll = false;
   for (const i in player.scrolls) {
     const scroll = player.scrolls[i];
     if (hasUsedScroll(player.role, scroll)) {

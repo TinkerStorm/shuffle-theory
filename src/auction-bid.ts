@@ -18,7 +18,14 @@ for (const role of roles) {
     return 1 + (scroll?.effect ?? 0);
   });
 
-  const selectedPlayer = chance.weighted(remainingPlayers, chances);
+  const isLastPlayer = remainingPlayers.length <= 1;
+
+  const selectedPlayer = isLastPlayer
+    ? chance.weighted(remainingPlayers, chances)
+    : remainingPlayers[0];
+
+  if(isLastPlayer)
+    console.log("Last player got the remaining role (chance.weighted was not used).");
 
   // assign role to selected player
   selectedPlayer.role = role;
