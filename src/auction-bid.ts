@@ -41,5 +41,5 @@ console.log('\n\n'); // spacer
 
 // list all users
 for (const { name, role, scrolls } of players) {
-  console.log(`${name} is a ${role}\n\t(${scrolls.map(s => `${s.role} -> ${s.effect}[${s.used}]`)})`);
+  console.log(`${name} is a ${role}\n\t(${scrolls.map(s => `${s.role} -> ${s.effect * 100}% [${s.used}]`)})`);
 }
