@@ -44,8 +44,8 @@ They are equally fast, but the `reducing-stock` is a bit more bias towards playe
 
 | Method | Iteratee | Stock | Time (5 runs) |
 | ------ | -------- | ----- | ---- |
-| `reducing-stock` | Player | Roles | 6.106 ms |
-| `auction-bid` | Role | Players | 6.151 ms |
+| `reducing-stock` | Player | Roles | 8.474 ms |
+| `auction-bid` | Role | Players | 8.158 ms |
 
 ---
 
