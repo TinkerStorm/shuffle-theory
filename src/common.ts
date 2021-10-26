@@ -36,7 +36,7 @@ export function getRoles(count: number = Player.COUNT, roles: Role[] = defaultRo
  * @param max The maximum effect of each scroll
  * @returns An array of scrolls
  */
-export function getScrolls(maxScrolls: number = 3, min: number = -0.1, max: number = 0.3): Scroll[] {
+export function getScrolls(maxScrolls: number = 3, min: number = -0.3, max: number = 0.3): Scroll[] {
   return chance.pickset(
     defaultRoles.map(role => new Scroll(
       role.name,
@@ -66,20 +66,31 @@ export function clamp(value: number, min: number, max: number) {
 
 export const log = (...args: any[]) => console.log(...args);
 
-export function logChances(players: Player[]): void {
-  // roles are guaranteed to have the same ratio
-  const uniqueRoles = getRoles(players.length).filter((role, index, roles) => roles.indexOf(role) === index);
+export function logChances(players: Player[], roles: string[]): void {
+  const uniqueRoles = [...new Set(roles)];
 
-  for (const role of uniqueRoles) {
-    log();
-    for (const player of players) {
-      const appliedScrolls = player.scrolls.filter(scroll => hasUsedScroll(role, scroll));
-      // TODO: account for the different effects from other players
-      const chance = (
-        (1 + sumBy(appliedScrolls, scroll => scroll.effect, 0)
-      ) / players.length * 100);
+  for (const role of uniqueRoles) {      
+    const chanceMap = players.reduce<{[player:string]:number}>((map, player) => {
+      const chance = sumBy(
+        player.scrolls.filter(scroll => scroll.role === role),
+        scroll => scroll.effect
+      );
+      map[player.name] = 1 + chance;
+      return map;
+    }, {});
+    
+    let chanceSum = Object.values(chanceMap).reduce((prev, curr) => prev + curr, 0);
+    for (const player of Object.keys(chanceMap)) {
+      chanceMap[player] /= chanceSum;
+    }
 
-      log(`[${role}] ${player.name} had ${chance.toFixed(2)}% chance.`);
+    const playerMaxLength = Math.max(...players.map(p => p.name.length)) + 1;
+    log(`\n\t${role}`);
+    log(`${'Player'.padEnd(playerMaxLength)} | Chance`);
+    //log(chanceMap);
+    for (const [name, chance] of Object.entries(chanceMap)) {
+      const pad = chance < 0.1 ? ' ' : '';
+      log(`${name.padEnd(playerMaxLength)} | ${pad}${(chance * 100).toFixed(3)}%`);
     }
   }
 }
@@ -92,11 +103,6 @@ export function logScrolls(players: Player[]): void {
     for (const scroll of player.scrolls) {
       log(`\t${scroll} ${scroll.used}`);
     }
+    log();
   }
-}
-
-export function averageChance(players: Player[]): number {
-  return players.reduce((acc, cur) => acc + (
-    (1 + sumBy(cur.usedScrolls, scroll => scroll.effect, 0)
-  ) / players.length * 100), 0);
 }

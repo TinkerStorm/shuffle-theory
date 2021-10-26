@@ -10,8 +10,7 @@
   "scripts": {
     "all": "npm-run-all --serial build mode:**",
     "build": "tsc",
-    "mode:auction": "node ./dist/auction-bid.js",
-    "mode:stock": "node ./dist/reducing-stock.js"
+    "mode:auction": "node ./dist/auction-bid.js"
   },
   "devDependencies": {
     "@types/chance": "^1.1.3",
