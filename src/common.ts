@@ -88,9 +88,10 @@ export function logScrolls(players: Player[]): void {
   log();
   for (const player of players) {
     // (playerChance / overallChance * 100).toFixed(2) + % ??
-    log(`${player.name} is a ${player.role}\n\t${
-      player.scrolls.map(scroll => `${scroll} [${scroll.used}]`).join('\n\t')
-    }`);
+    log(`${player.name} is a ${player.role}`);
+    for (const scroll of player.scrolls) {
+      log(`\t${scroll} ${scroll.used}`);
+    }
   }
 }
 

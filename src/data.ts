@@ -61,31 +61,6 @@ export class Scroll {
     this.used = true;
   }
 
-  chanceMap(players: Player[]): { [player: string]: number } {
-    const map = Object.create(null);
-    //#region loop1 - intial map
-    for (const player of players) {
-      map[player.name] = 1;
-      // get effect from scrolls
-      for (const scroll of player.scrolls.filter(scroll => scroll.role == this.role)) {
-        if (scroll.role === this.role) {
-          map[player.name] += scroll.effect;
-        }
-      }
-    }
-    //#endregion
-    //#region loop2 - scale to players
-    const scaleFactor = players.length + players.map(player => player.scrolls
-      .filter(scroll => scroll.role === this.role)
-      .map(scroll => scroll.effect)
-    ).flat().reduce((a, b) => a + b, 0) / players.length;
-    for (const player of players) {
-      map[player.name] *= scaleFactor;
-    }
-    //#endregion
-    return map;
-  }
-
   toString() {
     return `${this.role} scroll of ${this.effectString}`;
   }
