@@ -34,7 +34,7 @@ for (const role of roles) {
     chances[i] = chances[i] / scaleFactor;
     
   const calculatedChance = (chances[playerIndex] / remainingPlayers.length * 100).toFixed(2);
-  log(`${selectedPlayer.name} is a ${selectedPlayer.role} - ${calculatedChance}%`);
+  log(`${selectedPlayer.name} (${playerIndex}) is a ${selectedPlayer.role} - ${calculatedChance}%`);
 
   // log remaining player chances
   for (const [index, player] of remainingPlayers.entries()) {
@@ -43,7 +43,7 @@ for (const role of roles) {
     }
 
     const chance = (chances[index] / remainingPlayers.length * 100).toFixed(2);
-    log(`\t${player.name} had a ${chance}% chance`);
+    log(`\t${player.name} (${index}) had a ${chance}% chance`);
   }
   log();
 }
