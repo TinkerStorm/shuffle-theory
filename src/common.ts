@@ -21,12 +21,14 @@ export function getRoles(count: number = Player.COUNT, roles: Role[] = defaultRo
   // count / sum(roles.*.ratio)
   const scaleFactor = count / sum;
 
-  return roles.map(role => {
+  const array = roles.map(role => {
     // determine the number of roles to generate
     const roleCount = Math.round(role.ratio * scaleFactor);
     // generate an array of roleCount length, filled with the role name
     return Array(roleCount).fill(role.name);
   }).flat();
+
+  return chance.shuffle(array);
 }
 
 /**
