@@ -420,6 +420,11 @@ resolve@^1.10.0:
     is-core-module "^2.2.0"
     path-parse "^1.0.6"
 
+scale-to@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/scale-to/-/scale-to-1.0.0.tgz#22e55dc98bc0b8ad81c2d21fee4bcb442f82213b"
+  integrity sha512-5BQKVr2OX/vh9reV2r/ipfehNr+Uky8tZpM5TAD7PwLESKiOB7Kuv1MoKSjS41F6qTB4V2+bv6h7TxdNCec9Fg==
+
 "semver@2 || 3 || 4 || 5", semver@^5.5.0:
   version "5.7.1"
   resolved "https://registry.yarnpkg.com/semver/-/semver-5.7.1.tgz#a954f931aeba508d307bbf069eff0c01c96116f7"

@@ -4,13 +4,15 @@
   "description": "Weighted role shuffle possiblities.",
   "private": true,
   "dependencies": {
-    "chance": "^1.1.8"
+    "chance": "^1.1.8",
+    "scale-to": "^1.0.0"
   },
   "license": "GPL-3.0",
   "scripts": {
     "all": "npm-run-all --serial build mode:**",
     "build": "tsc",
-    "mode:auction": "node ./dist/auction-bid.js"
+    "mode:auction": "node ./dist/auction-bid.js",
+    "mode:blind-auction": "node ./dist/blind-auction.js"
   },
   "devDependencies": {
     "@types/chance": "^1.1.3",

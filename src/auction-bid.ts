@@ -1,4 +1,6 @@
-import { chance, getPlayers, getRoles, hasUsedScroll, log, logChances, logScrolls, sumBy } from './common';
+import { chance, getPlayers, getRoles, hasUsedScroll, sumBy } from './common';
+
+import { logScrolls, logChances } from './debug';
 
 const roles = getRoles();
 const players = getPlayers();
@@ -34,7 +36,7 @@ for (const role of roles) {
     chances[i] = chances[i] / scaleFactor;
     
   const calculatedChance = (chances[playerIndex] / remainingPlayers.length * 100).toFixed(2);
-  log(`${selectedPlayer.name} (${playerIndex}) is a ${selectedPlayer.role} - ${calculatedChance}%`);
+  let outcome = `${selectedPlayer.name} (${playerIndex}) is a ${selectedPlayer.role} - ${calculatedChance}%\n`;
 
   // log remaining player chances
   for (const [index, player] of remainingPlayers.entries()) {
@@ -43,23 +45,20 @@ for (const role of roles) {
     }
 
     const chance = (chances[index] / remainingPlayers.length * 100).toFixed(2);
-    log(`\t${player.name} (${index}) had a ${chance}% chance`);
+    outcome += `\t${player.name} (${index}) had a ${chance}% chance\n`;
   }
-  log();
+  console.debug(outcome);
 }
-log();
 
+// determine if any players have used active scrolls
 for (const player of players) {
-  // determine if a negative effect scroll has been used
   for (const scroll of player.scrolls) {
     if (hasUsedScroll(player.role!, scroll)) {
       scroll.use();
-      log(`${player.name} used a ${scroll}`);
     }
   }
 }
 
-log();
 console.timeEnd('auction-bid');
 
 logScrolls(players);

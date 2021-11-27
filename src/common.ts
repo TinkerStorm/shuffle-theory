@@ -21,12 +21,12 @@ export function getRoles(count: number = Player.COUNT, roles: Role[] = defaultRo
   // count / sum(roles.*.ratio)
   const scaleFactor = count / sum;
 
-  const array = roles.map(role => {
+  const array = roles.flatMap<string>(role => {
     // determine the number of roles to generate
     const roleCount = Math.round(role.ratio * scaleFactor);
     // generate an array of roleCount length, filled with the role name
     return Array(roleCount).fill(role.name);
-  }).flat();
+  });
 
   return chance.shuffle(array);
 }
@@ -66,45 +66,9 @@ export function clamp(value: number, min: number, max: number) {
   else return value;
 }
 
-export const log = (...args: any[]) => console.log(...args);
+export function scaleTo(total: number, list: number[]) {
+  const sum = list.reduce((sum, curr) => sum + curr, 0);
+  const scale = total / sum;
 
-export function logChances(players: Player[], roles: string[]): void {
-  const uniqueRoles = [...new Set(roles)];
-
-  for (const role of uniqueRoles) {      
-    const chanceMap = players.reduce<{[player:string]:number}>((map, player) => {
-      const chance = sumBy(
-        player.scrolls.filter(scroll => scroll.role === role),
-        scroll => scroll.effect
-      );
-      map[player.name] = 1 + chance;
-      return map;
-    }, {});
-    
-    let chanceSum = Object.values(chanceMap).reduce((prev, curr) => prev + curr, 0);
-    for (const player of Object.keys(chanceMap)) {
-      chanceMap[player] /= chanceSum;
-    }
-
-    const playerMaxLength = Math.max(...players.map(p => p.name.length)) + 1;
-    log(`\n\t${role}`);
-    log(`${'Player'.padEnd(playerMaxLength)} | Chance`);
-    //log(chanceMap);
-    for (const [name, chance] of Object.entries(chanceMap)) {
-      const pad = chance < 0.1 ? ' ' : '';
-      log(`${name.padEnd(playerMaxLength)} | ${pad}${(chance * 100).toFixed(3)}%`);
-    }
-  }
-}
-
-export function logScrolls(players: Player[]): void {
-  log();
-  for (const player of players) {
-    // (playerChance / overallChance * 100).toFixed(2) + % ??
-    log(`${player.name} is a ${player.role}`);
-    for (const scroll of player.scrolls) {
-      log(`\t${scroll} ${scroll.used}`);
-    }
-    log();
-  }
+  return list.map(el => el * scale);
 }
