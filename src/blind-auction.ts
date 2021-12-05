@@ -1,16 +1,20 @@
 import { chance, getPlayers, getRoles, hasUsedScroll, sumBy } from './common';
 
-import { logChances, logScrolls } from './debug';
+import { logPlayerChances, logRoleChances, logRoles, logScrolls } from './debug';
 
 const roles = getRoles();
 const players = getPlayers();
 
 console.time('blind-auction');
 
-for (const role of roles) {
+for (const roleIndex in roles) {
+  const role = roles[roleIndex];
   const remainingPlayers = players.filter(player => !player.role);
+  if (remainingPlayers.length === 0) {
+    console.log(`No remaining players, remaining roles: ${roles.slice(+roleIndex).join(', ')}`);
+    break;
+  }
 
-  // get range of indexes for players
   const remainingIndexes = chance.shuffle([...remainingPlayers.keys()]);
 
   const chances = remainingIndexes.map(index => {
@@ -27,24 +31,15 @@ for (const role of roles) {
   for (const index in chances) {
     const chance = chances[index];
     acc += chance;
-    // console.log(`${acc} at ${remainingIndexes[index]} with ${chance}`);
     if (acc >= randomChance) {
       playerIndex = +remainingIndexes[index];
-      // console.log(`${remainingPlayers[playerIndex].name} (${playerIndex}) is a ${role} at ${randomChance}`);
       break;
     }
   }
 
-
-  //const playerIndex = isLastPlayer
-  //  ? remainingIndexes[0]
-  //  : chance.weighted(remainingIndexes, chances);
-
   const selectedPlayer = remainingPlayers[playerIndex];
 
   selectedPlayer.role = role;
-
-  // const playerIndex = remainingPlayers.indexOf(selectedPlayer);
 
   const percentages = chances.slice();
   let scaleFactor = sumBy(percentages, percentages => percentages) / percentages.length;
@@ -52,8 +47,8 @@ for (const role of roles) {
     percentages[i] = percentages[i] / scaleFactor;
 
   const calculatedChance = (percentages[playerIndex] / remainingPlayers.length * 100).toFixed(2);
-  let outcome = `${selectedPlayer.name} (${playerIndex}) is a ${selectedPlayer.role} - ${calculatedChance}% (${chances[playerIndex].toFixed(2)})\n`;
-  outcome += `\t[${remainingIndexes.join(', ')}] - ${randomChance.toFixed(5)}\n`
+  console.log(`\n${selectedPlayer.name} (${playerIndex}) is a ${selectedPlayer.role} (${roleIndex}) - ${calculatedChance}% (${chances[playerIndex].toFixed(2)})`);
+  console.log(`\t[${remainingIndexes.join(', ')}] - ${randomChance.toFixed(5)}`)
   for (const index of remainingIndexes) {
     const player = remainingPlayers[index];
     const percentage = (percentages[index] / remainingPlayers.length * 100).toFixed(2);
@@ -63,9 +58,8 @@ for (const role of roles) {
     }
 
     const chance = (chances[index]).toFixed(2);
-    outcome += `\t${player.name} (${index}) had a ${percentage}% chance (${chance})\n`;
+    console.log(`\t${player.name} (${index}) had a ${percentage}% chance (${chance})`);
   }
-  console.debug(outcome);
 }
 
 for (const player of players) {
@@ -78,5 +72,7 @@ for (const player of players) {
 
 console.timeEnd('blind-auction');
 
+logRoles(roles);
 logScrolls(players);
-logChances(players, roles);
+logPlayerChances(players, roles);
+logRoleChances(players, roles);

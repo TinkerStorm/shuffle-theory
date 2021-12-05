@@ -1,6 +1,6 @@
 import { chance, getPlayers, getRoles, hasUsedScroll, sumBy } from './common';
 
-import { logScrolls, logChances } from './debug';
+import { logScrolls, logPlayerChances, logRoleChances, logRoles } from './debug';
 
 const roles = getRoles();
 const players = getPlayers();
@@ -61,5 +61,7 @@ for (const player of players) {
 
 console.timeEnd('auction-bid');
 
+logRoles(roles);
 logScrolls(players);
-logChances(players, roles);
+logPlayerChances(players, roles);
+logRoleChances(players, roles);
