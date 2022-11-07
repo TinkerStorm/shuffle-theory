@@ -1,4 +1,5 @@
-import { chance, getPlayers, getRoles, hasUsedScroll, sumBy } from './common';
+import { chance, getPlayers, getRoles, hasUsedScroll } from './util/common';
+import { sumBy } from './util/number';
 
 import { logPlayerChances, logRoleChances, logRoles, logScrolls } from './debug';
 

@@ -1,21 +1,25 @@
 {
   "name": "weighted-role-shuffle",
   "version": "1.0.0",
-  "description": "Weighted role shuffle possiblities.",
+  "description": "Weighted role shuffle possibilities.",
   "private": true,
   "dependencies": {
-    "chance": "^1.1.8",
-    "scale-to": "^1.0.0"
+    "chance": "^1.1.9",
+    "cliff": "^0.1.10",
+    "emittery": "^1.0.1",
+    "signale": "^1.4.0"
   },
   "license": "GPL-3.0",
   "scripts": {
     "all": "npm-run-all --serial build mode:**",
-    "build": "tsc",
+    "build": "npx rimraf ./dist && tsc",
     "mode:auction": "node ./dist/auction-bid.js",
     "mode:blind-auction": "node ./dist/blind-auction.js"
   },
   "devDependencies": {
     "@types/chance": "^1.1.3",
+    "@types/node": "^18.11.9",
+    "@types/signale": "^1.4.4",
     "npm-run-all": "^4.1.5"
   }
 }

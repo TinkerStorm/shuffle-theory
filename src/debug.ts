@@ -1,20 +1,20 @@
-import { chance, scaleTo, sumBy } from "./common";
 import { Player } from "./data";
+import { scaleTo, sumBy } from "./util/number";
 
 export function logRoles(roles: string[]) {
   const uniqueRoles = [...new Set(roles)];
 
-  const table = {} as { [key: string]: { Count: number, Ratio: number /*, Chance: number */ } };
+  const table = {} as { [key: string]: { Count: number, Ratio: `${number}%` /*, Chance: number */ } };
 
   for (const role of uniqueRoles) {
     table[role] = {
       Count: roles.filter(r => r === role).length,
-      Ratio: roles.filter(r => r === role).length / roles.length,
+      Ratio: `${(roles.filter(r => r === role).length / roles.length) * 100}%`,
     }
   }
 
   console.log(`\n\tRole distribution`);
-  console.log(`\tWhen ${roles.length} players are in the game, the following roles are present:`);
+  console.log(`\tWhen ${roles.length} roles are in the game, the following roles are present:`);
   console.table(table);
 }
 
@@ -84,7 +84,7 @@ export function logRoleChances(players: Player[], roles: string[]): void {
       chances[role] = chance;
     }
 
-    const scaleFactor = sumBy(Object.values(chances), (c) => c);
+    const scaleFactor = sumBy(Object.values(chances), (c: any) => c);
     for (const role in chances) {
       const trueChance = chances[role] / scaleFactor;
       (table[player.name] ??= {})[role] = (trueChance * 100).toFixed(2) + "%";
