@@ -3,8 +3,6 @@ import { RoleAttributes } from "../util/types";
 export interface RosterOptions {
   // extendedResults: boolean;
   // useRemainderRoles: boolean;
-  /** Decide whether to log information about the roster generation process. */
-  disableLogging: boolean;
 
   /** Whether to shuffle the role data before assembling the roster. */
   shuffleRoleData: boolean;
@@ -50,46 +48,6 @@ export enum ChanceType {
   /** Set total to a random number between 0 and threshold */
   RANDOM = "random"
 }
-
-/** This contains the necessary data to *assemble* the role roster that is to be assigned to players. */
-//export interface RoleData {
-//  /** The type of role behaviour. */
-//  type: RoleType;
-//  /** The identifier of the role entry. */
-//  label: string;
-//  /** The list of roles to select from. */
-//  selection: string[];
-//  /** Minimum number of players required to include this role. */
-//  activation: number;
-//  /** The physical chance the role will be included in the roster, after meeting the activation threshold. */
-//  activationChance: number;
-//  /** The absolute quantity of the role, after activation. */
-//  quantity: number;
-//  /** Minimum number of roles to add, after activation. */
-//  minimum: number;
-//  /** Maximum number of players allowed to play this role. */
-//  maximum: number;
-//  /** Include the initial player count that was required to get the role. */
-//  include: boolean;
-//  /** The number of players required to add another role. */
-//  each: number;
-//  /** The target role to replace when called upon. */
-//  replace: string;
-//  /** The chance of the role being given to a player */
-//  chance: number;
-//  /** The type of chance behaviour */
-//  chanceType: ChanceType;
-//  /**
-//   * The thresholds to add a new role.
-//   * @example
-//   * // activation: 5, include: false, thresholds: [2, 4]
-//   * new RoleBuilder('role').withActivation(5, false).thresholds([2, 4])
-//   * // 5 players are required to activate the role, and then 2 more players are required to add the role.
-//   */
-//  thresholds: number[];
-//  /** Specifies the role should not be repeated after initial selection. */
-//  unique: boolean;
-//}
 
 interface RoleActivation {
   /** The number of players required to activate the role. */
@@ -156,8 +114,6 @@ export interface RoleData {
   /** The chance descriptor attached to the role. */
   chance?: RoleChance;
 
-  /** The attributes for role selection, after completion. */
-  attributes?: RoleAttributes;
-
+  /** The context of the role. */
   context?: RoleContext;
 }

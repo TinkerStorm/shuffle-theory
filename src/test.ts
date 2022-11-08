@@ -2,7 +2,7 @@ import { logRoles } from "./debug";
 import getRoster from "./distribution/assembler";
 import { Role } from "./distribution/builder";
 import { ChanceType } from "./distribution/types";
-import { logger } from "./util/logger";
+import logger from "./util/logger";
 
 const roles = [
   //  // min: 5, each: 4, at least: 1
@@ -38,21 +38,22 @@ function wrapDuration() {
 const playerCount = parseInt(process.argv[2] ?? 10);
 const duration = wrapDuration();
 const customResult = getRoster(roles, playerCount);
+logger.setEnabled(true);
 logger.info(`Custom of ${playerCount} players took ${duration().toLocaleString()}ms`);
-console.log(customResult);
+logger.log(customResult);
 logRoles(customResult.roster);
 
-for (let players = 0; players < 20; players++) {
-  const overall = wrapDuration();
-  for (let i = 0; i < 10_000; i++) {
-    getRoster(roles, players + 6, {
-      disableLogging: true
-    });
-  }
-  const duration = overall();
+//for (let players = 0; players < 20; players++) {
+//  const overall = wrapDuration();
+//  for (let i = 0; i < 10_000; i++) {
+//    getRoster(roles, players + 6);
+//  }
+//  const duration = overall();
 
-  logger.log(`${players + 6} players took ${duration.toLocaleString()}ms (average: ${(duration / 10_000)}ms)`);
-}
+//  logger.setEnabled(true);
+//  logger.info(`${players + 6} players took ${duration.toLocaleString()}ms (average: ${(duration / 10_000)}ms)`);
+//  logger.setEnabled(false);
+//}
 
 // Benchmark
 

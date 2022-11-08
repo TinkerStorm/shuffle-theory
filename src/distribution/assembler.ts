@@ -1,5 +1,5 @@
-// Imports (Util)
-import { logger } from '../util/logger';
+// Imports (Utils)
+import logger from '../util/logger';
 
 // Imports (Functions)
 import { pickOneFrom, shuffleList } from "../util/list";
@@ -10,31 +10,28 @@ import { ChanceType, RoleData, RoleType, RosterOptions, RosterResults } from "./
 
 function insertRole(roster: string[], role: RoleData, count: number, options: Partial<RosterOptions>) {
   const { unique, selection, replace, label } = role;
-  const index = replace ? roster.indexOf(replace) : roster.length;
   const { maxRetries = 10 } = options;
-
-  const shouldPrint = !options.disableLogging;
-
+  
   let i = 0, retries = 0;
-
+  
   while (i < count && retries <= maxRetries) {
+    const index = replace ? roster.indexOf(replace) : roster.length;
+
     if (index && index < 0) {
-      if (shouldPrint) logger.warn(`[!] ${replace} is not in the roster, skipping remaining iterations for ${label}`);
+      logger.warn(`  [!] %s is not in the roster, skipping remaining iterations for %s`, [replace, label]);
       break; // no more roles to replace
     }
 
     const selected = selection.length === 1 ? selection[0] : pickOneFrom(selection);
-
-    // debugging label
     const combinedLabel = selected === label ? label : `${label} (${selected})`;
 
     if (unique && roster.includes(selected)) {
-      if (shouldPrint) logger.warn(`${combinedLabel} is unique, retrying...`);
+      logger.warn('    [!] %s is unique and already in the roster, skipping...', [selected]);
       retries++; // try again
       continue;
     }
 
-    if (shouldPrint) logger.star(`${combinedLabel} (${roster.length}) ${retries > 0 ? `(${retries} retries)` : ''}`);
+    logger.info('  [*] %s [%o] (%o retries)', [combinedLabel, index + 1, retries]);
 
     if (replace && index < roster.length) roster.splice(index, 1, selected);
     else roster.push(selected);
@@ -42,7 +39,7 @@ function insertRole(roster: string[], role: RoleData, count: number, options: Pa
     i++;
 
     if (unique && i >= selection.length) {
-      if (shouldPrint) logger.success(`${combinedLabel} is unique, but there are no more roles to use`);
+      logger.info(`  [!] %s (%s) is unique, skipping remaining iterations`, [label, selection.length]);
       break; // no more roles
     }
   }
@@ -50,9 +47,7 @@ function insertRole(roster: string[], role: RoleData, count: number, options: Pa
   return roster;
 }
 
-function getQuantity(role: RoleData, initial: number, options: Partial<RosterOptions>) {
-  const shouldPrint = !options.disableLogging;
-
+function getQuantity(role: RoleData, initial: number) {
   const { label, type } = role;
 
   switch (type) {
@@ -65,10 +60,10 @@ function getQuantity(role: RoleData, initial: number, options: Partial<RosterOpt
     case RoleType.INCREMENT:
       return Math.floor(initial / role.each);
     case RoleType.REMAINDER:
-      if (shouldPrint) logger.warn(`${label} is a remainder role, skipping...`);
+      logger.warn(`  [!] %s is a remainder role, skipping...`, [label]);
       break;
     default:
-      logger.error(`${label} has an unknown or invalid type for standard use, skipping...`);
+      logger.error(`  [#] %s has an unknown or invalid type for standard use, skipping...`, [label]);
       break;
   }
 
@@ -99,29 +94,30 @@ export function getComposition(roster: string[]): Record<string, number> {
 }
 
 export function getRoster(
-  data: RoleData[],
+  roles: RoleData[],
   playerCount: number,
   options: Partial<RosterOptions> = {}
 ): RosterResults {
-  if (options.shuffleRoleData) data = shuffleList(data);
+  if (options.shuffleRoleData) roles = shuffleList(roles);
 
   const roster: string[] = [];
 
-  for (const role of data.filter(r => r.type !== RoleType.REMAINDER)) {
+  for (const role of roles.filter(r => r.type !== RoleType.REMAINDER)) {
+    logger.info(`[^] ${role.label} (${role.type})`);
+
     if (role.activation && role.activation.chance! !== 1) {
       const { activation, label } = role;
 
       const value = Math.random();
       if (activation.chance! < value) {
-        if (!options.disableLogging)
-          logger.note(`${label} has failed to activate (${activation.chance} < ${value})`);
+        logger.warn(`  [!] ${label} has failed to activate (${activation.chance} < ${value})`);
         continue;
       }
     }
 
     const initial = !role.activation?.include ? playerCount - (role.activation?.value ?? 0) : playerCount;
 
-    let count = getQuantity(role, initial, options);
+    let count = getQuantity(role, initial);
 
     if (role.chance) {
       const { value, type } = role.chance;
@@ -131,7 +127,7 @@ export function getRoster(
 
       count = Math.min(Math.max(change, 0), before);
 
-      if (!options.disableLogging) logger.star(`${role.label} chance (${before} -> ${change}, ${type})`);
+      logger.info(`  [%] ${role.label} chance (${before} -> ${change}, ${type})`);
     }
 
     if (role.range) {
@@ -140,23 +136,36 @@ export function getRoster(
     }
 
     if (isNaN(count)) {
-      logger.error(`${role.label} has an invalid count, skipping...`);
+      logger.error(`  [-] ${role.label} has an invalid count, skipping...`);
       continue;
+    }
+
+    if (count <= 0) {
+      logger.warn(`  [<] ${role.label} has no count, skipping...`);
     }
 
     insertRole(roster, role, count, options);
   }
 
-  const fillerRoles = data.filter(r => r.type === RoleType.REMAINDER);
+  const fillerRoles = roles.filter(r => r.type === RoleType.REMAINDER);
 
   if (fillerRoles.length > 0 && roster.length < playerCount) {
-    if (!options.disableLogging) logger.note(`Adding filler roles... (${roster.length} of ${playerCount})`);
+    logger.info(`[&] Adding filler roles... (${roster.length} of ${playerCount})`);
 
-    let index = 0;
-    while (roster.length < playerCount) {
-      const role = fillerRoles[index];
-      insertRole(roster, role, 1, options);
-      index = wrap(index + 1, 0, fillerRoles.length);
+    if (fillerRoles.length > 1) {
+      let index = 0;
+      logger.info(`  [!] Multiple filler roles detected, alternating between them...`);
+      while (roster.length < playerCount) {
+        insertRole(roster, fillerRoles[index], 1, options);
+        index = wrap(index + 1, 0, fillerRoles.length);
+      }
+    } else {
+      const [role] = fillerRoles;
+      const count = playerCount - roster.length;
+      logger.info('[>] Only one filler role, adding %s of %s', [count, role.label]);
+      const revert = logger.wrapToggle(false);
+      insertRole(roster, role, count, options);
+      revert();
     }
   }
 
