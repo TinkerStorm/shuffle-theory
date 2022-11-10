@@ -1,13 +1,11 @@
-import { RoleAttributes } from "../util/types";
-
 export interface RosterOptions {
   // extendedResults: boolean;
   // useRemainderRoles: boolean;
 
   /** Whether to shuffle the role data before assembling the roster. */
-  shuffleRoleData: boolean;
+  shuffleRoleData?: boolean;
   /** Maximum number of retries to insert a role before giving up. */
-  maxRetries: number;
+  maxRetries?: number;
 }
 
 export interface RosterResults {
